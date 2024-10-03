@@ -5,12 +5,15 @@ import axios from "axios";
 // Register User Thunk
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async ({ name, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/register", {
-        name,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:4000/api/users/register",
+        {
+          email,
+          password,
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -23,7 +26,10 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ name, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/login", { name, password });
+      const response = await axios.post(
+        "http://localhost:4000/api/users/login",
+        { name, password }
+      );
       return response.data.token; // Return the token on success
     } catch (error) {
       return rejectWithValue(error.response.data);
