@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Modal from "./modal"; // Import Modal component
 import Login from "./login"; // Assuming Login component will be displayed
 import Register from "./register"; // Assuming Register component will be displayed
@@ -7,7 +6,6 @@ import "../styles/home.css";
 
 const Home = () => {
   const [modalContent, setModalContent] = useState(null);
-  const navigate = useNavigate();
 
   const openModal = (type) => {
     if (type === "login") {

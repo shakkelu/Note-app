@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+
 import "../styles/sidebar.css";
 import Modal from "./modal"; // Reuse the Modal component
 import Login from "./login"; // Reuse the Login form component

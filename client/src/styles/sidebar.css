@@ -47,13 +47,3 @@
   right: 15px;
 }
 
-/* Add this to sidebar.css or your global CSS file */
-.blur-background {
-  filter: blur(5px);
-  transition: filter 0.3s ease;
-}
-
-/* To ensure smooth transitions, you can control the body height */
-.body-no-scroll {
-  overflow: hidden; /* Prevent scrolling when sidebar is open */
-}

@@ -21,16 +21,29 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Login User Thunk
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
-  async ({ name, password }, { rejectWithValue }) => {
+// Validate Email Thunk
+export const validateEmail = createAsyncThunk(
+  "auth/validateEmail",
+  async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/users/login",
-        { name, password }
-      );
-      return response.data.token; // Return the token on success
+      const response = await axios.post("/api/users/validateEmail", { email });
+      return response.data; // Assuming the response tells whether the email exists
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Login with Password Thunk
+export const loginWithPassword = createAsyncThunk(
+  "auth/loginWithPassword",
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/users/login", {
+        email,
+        password,
+      });
+      return response.data.token; // Return token on success
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -41,6 +54,7 @@ export const loginUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+    emailValidated: false,
     userToken: null,
     isAuthenticated: false,
     loading: false,
@@ -53,7 +67,7 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Register
+    //User registration
     builder.addCase(registerUser.pending, (state) => {
       state.loading = true;
       state.error = null;
@@ -67,24 +81,36 @@ const authSlice = createSlice({
       state.error = action.payload;
     });
 
-    // Login
-    builder.addCase(loginUser.pending, (state) => {
+    // Email validation
+    builder.addCase(validateEmail.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
+    builder.addCase(validateEmail.fulfilled, (state, action) => {
+      state.loading = false;
+      state.emailValidated = true; // Email is validated
+    });
+    builder.addCase(validateEmail.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Password login
+    builder.addCase(loginWithPassword.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(loginWithPassword.fulfilled, (state, action) => {
       state.loading = false;
       state.userToken = action.payload;
       state.isAuthenticated = true;
     });
-    builder.addCase(loginUser.rejected, (state, action) => {
+    builder.addCase(loginWithPassword.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
   },
 });
 
-// Export Actions
 export const { logout } = authSlice.actions;
-
 export default authSlice.reducer;
