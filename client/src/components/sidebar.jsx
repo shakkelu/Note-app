@@ -12,14 +12,16 @@ const Sidebar = ({ isOpen, onClose }) => {
   const openModal = (type) => {
     if (type === "login") {
       setModalContent(<Login />);
+      onClose();
     } else if (type === "register") {
       setModalContent(<Register />);
+      onClose();
     }
   };
 
   const closeModal = () => {
     setModalContent(null); // Close the modal
-    onClose(); // Also close the sidebar
+    //onClose(); // Also close the sidebar
   };
 
   return (
@@ -29,7 +31,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           &times;
         </button>
         <nav className="sidebar-nav">
-          {/* Replace NavLink with button to open modal */}
           <button className="sidebar-link" onClick={() => openModal("login")}>
             Login
           </button>
@@ -41,8 +42,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </nav>
       </div>
-
-      {/* Show the modal if there's content */}
       {modalContent && <Modal onClose={closeModal}>{modalContent}</Modal>}
     </>
   );

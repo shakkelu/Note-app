@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import generateToken from "../utils/generateToken.js"; // Import the token utility
 
 const router = express.Router();
 
@@ -18,14 +19,18 @@ router.post("/register", async (req, res) => {
     // Create and save new user
     const user = new User({ email, password });
     await user.save();
-    res.json({ message: "User registered successfully" });
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    res.json({ token, message: "User registered successfully" }); // Send token upon registration
   } catch (err) {
     res.status(500).json({ error: "Failed to register user" });
   }
 });
 
 // Email Verification Route
-router.post("/verify-email", async (req, res) => {
+router.post("/validateEmail", async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email }); // Verify by email instead of name
@@ -47,11 +52,10 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Generate token
+    const token = generateToken(user._id);
 
-    res.json({ token });
+    res.json({ token }); // Send token upon login
   } catch (err) {
     res.status(500).json({ error: "Login failed" });
   }

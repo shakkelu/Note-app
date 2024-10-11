@@ -1,4 +1,3 @@
-// store/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -14,7 +13,7 @@ export const registerUser = createAsyncThunk(
           password,
         }
       );
-      return response.data;
+      return response.data; // Contains token and message
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -64,16 +63,18 @@ const authSlice = createSlice({
     logout: (state) => {
       state.userToken = null;
       state.isAuthenticated = false;
+      localStorage.removeItem("token"); // Remove token from storage
     },
   },
   extraReducers: (builder) => {
-    //User registration
+    // User registration
     builder.addCase(registerUser.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.loading = false;
+      state.userToken = action.payload.token; // Store token from registration
       state.isAuthenticated = true;
     });
     builder.addCase(registerUser.rejected, (state, action) => {
@@ -113,4 +114,5 @@ const authSlice = createSlice({
 });
 
 export const { logout } = authSlice.actions;
+
 export default authSlice.reducer;

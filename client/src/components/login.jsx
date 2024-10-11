@@ -1,70 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { loginUser } from "../store/authSlice";
+import { loginWithPassword } from "../store/authSlice";
+import { useNavigate } from "react-router-dom"; // If using react-router for navigation
+import Modal from "./modal"; // Import Modal component
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [step, setStep] = useState(1); // Step 1: Ask for email, Step 2: Ask for password
   const dispatch = useDispatch();
-  const { loading, error, isAuthenticated } = useSelector(
+  const navigate = useNavigate(); // Initialize navigate
+
+  const { loading, error, isAuthenticated, userToken } = useSelector(
     (state) => state.auth
   );
 
-  // Step 1: Verify Email
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("/api/users/verify-email", { email });
-      if (response.data.message === "Email verified successfully") {
-        setStep(2); // Move to the password step
-      }
-    } catch (err) {
-      console.error(err.response.data.error); // Handle error (e.g., show email not found)
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Optionally, save the token to localStorage for persistence
+      localStorage.setItem("token", userToken);
+      // Redirect to a protected route after login
+      navigate("/dashboard"); // Replace with your desired route
     }
-  };
+  }, [isAuthenticated, navigate, userToken]);
 
-  // Step 2: Submit Login with Password
-  const handlePasswordSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    dispatch(loginWithPassword({ email, password }));
   };
 
   return (
     <div>
       <h1>Login</h1>
-
-      {step === 1 && (
-        <form onSubmit={handleEmailSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Verifying..." : "Next"}
-          </button>
-        </form>
-      )}
-
-      {step === 2 && (
-        <form onSubmit={handlePasswordSubmit}>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-      )}
-
-      {error && <p>{error.error}</p>}
-      {isAuthenticated && <p>Logged in successfully</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required // Add validation
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required // Add validation
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error.error}</p>}
     </div>
   );
 };
