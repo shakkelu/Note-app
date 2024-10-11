@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
-
+import modalReducer from "./modalSlice";
 // Load token from localStorage if available
 const token = localStorage.getItem("token")
   ? localStorage.getItem("token")
@@ -10,6 +10,7 @@ const store = configureStore({
   reducer: {
     auth: authReducer,
   },
+  modal: modalReducer,
   preloadedState: {
     auth: {
       emailValidated: false,

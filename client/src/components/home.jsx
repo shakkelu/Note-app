@@ -1,9 +1,9 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal, closeModal } from "../store/modalSlice"; // Import Redux actions
-import Modal from "./modal"; // Import Modal component
-import Login from "./login"; // Assuming Login component will be displayed
-import Register from "./register"; // Assuming Register component will be displayed
+import Modal from "./modal";
+import Login from "./login";
+import Register from "./register";
 import "../styles/home.css";
 
 const Home = () => {
@@ -20,7 +20,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="home-body">
+      <div className={`home-body ${isModalOpen ? "blur-background" : ""}`}>
         <div className="home-container">
           <div className="welcome-message">
             <h1>Welcome to Notes App</h1>
@@ -47,6 +47,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+
       {/* Modal is displayed based on Redux state */}
       {isModalOpen && (
         <Modal onClose={() => dispatch(closeModal())}>{modalContent}</Modal>

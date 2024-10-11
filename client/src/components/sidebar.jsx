@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { openModal, closeModal } from "../store/modalSlice"; // Import Redux actions
 
 import "../styles/sidebar.css";
 import Modal from "./modal"; // Reuse the Modal component
@@ -6,23 +8,16 @@ import Login from "./login"; // Reuse the Login form component
 import Register from "./register"; // Reuse the Register form component
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const [modalContent, setModalContent] = useState(null);
+  const dispatch = useDispatch();
+  const { isModalOpen, modalContentType } = useSelector((state) => state.modal); // Access modal state from Redux
 
-  // Open modal with the corresponding form
-  const openModal = (type) => {
-    if (type === "login") {
-      setModalContent(<Login />);
-      onClose();
-    } else if (type === "register") {
-      setModalContent(<Register />);
-      onClose();
-    }
-  };
-
-  const closeModal = () => {
-    setModalContent(null); // Close the modal
-    //onClose(); // Also close the sidebar
-  };
+  // Modal content based on the state
+  let modalContent;
+  if (modalContentType === "login") {
+    modalContent = <Login />;
+  } else if (modalContentType === "register") {
+    modalContent = <Register />;
+  }
 
   return (
     <>
@@ -31,18 +26,23 @@ const Sidebar = ({ isOpen, onClose }) => {
           &times;
         </button>
         <nav className="sidebar-nav">
-          <button className="sidebar-link" onClick={() => openModal("login")}>
+          <button
+            className="home-button"
+            onClick={() => dispatch(openModal("login"))} // Dispatch openModal action with "login"
+          >
             Login
           </button>
           <button
-            className="sidebar-link"
-            onClick={() => openModal("register")}
+            className="home-button"
+            onClick={() => dispatch(openModal("register"))} // Dispatch openModal action with "register"
           >
             Signup
           </button>
         </nav>
       </div>
-      {modalContent && <Modal onClose={closeModal}>{modalContent}</Modal>}
+      {isModalOpen && (
+        <Modal onClose={() => dispatch(closeModal())}>{modalContent}</Modal>
+      )}
     </>
   );
 };
