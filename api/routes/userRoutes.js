@@ -1,6 +1,5 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import generateToken from "../utils/generateToken.js"; // Import the token utility
 
@@ -55,7 +54,7 @@ router.post("/login", async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    res.json({ token }); // Send token upon login
+    res.json({ token, message: "User login successfull" }); // Send token upon login
   } catch (err) {
     res.status(500).json({ error: "Login failed" });
   }

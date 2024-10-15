@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/modal.css";
 
+
 const Modal = ({ children, onClose }) => {
   return (
     <div className="modal-overlay">

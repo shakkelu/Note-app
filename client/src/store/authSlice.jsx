@@ -25,7 +25,10 @@ export const validateEmail = createAsyncThunk(
   "auth/validateEmail",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/validateEmail", { email });
+      const response = await axios.post(
+        "http://localhost:4000/api/users/validateEmail",
+        { email }
+      );
       return response.data; // Assuming the response tells whether the email exists
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -38,10 +41,13 @@ export const loginWithPassword = createAsyncThunk(
   "auth/loginWithPassword",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:4000/api/users/login",
+        {
+          email,
+          password,
+        }
+      );
       return response.data.token; // Return token on success
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -76,6 +82,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.userToken = action.payload.token; // Store token from registration
       state.isAuthenticated = true;
+      console.log(action.payload);
     });
     builder.addCase(registerUser.rejected, (state, action) => {
       state.loading = false;
@@ -90,6 +97,7 @@ const authSlice = createSlice({
     builder.addCase(validateEmail.fulfilled, (state, action) => {
       state.loading = false;
       state.emailValidated = true; // Email is validated
+      console.log(action.payload);
     });
     builder.addCase(validateEmail.rejected, (state, action) => {
       state.loading = false;
@@ -105,6 +113,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.userToken = action.payload;
       state.isAuthenticated = true;
+      console.log(action.payload);
     });
     builder.addCase(loginWithPassword.rejected, (state, action) => {
       state.loading = false;
