@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../store/authSlice";
 import { useNavigate } from "react-router-dom"; // If using react-router for navigation
-import Modal from "./modal"; // Import Modal component
 
 const Login = () => {
   const [email, setEmail] = useState("");

@@ -71,6 +71,17 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem("token"); // Remove token from storage
     },
+    setToken: (state, action) => {
+      state.userToken = localStorage.getItem("token")
+        ? localStorage.getItem("token")
+        : null;
+      state.isAuthenticated = localStorage.getItem("token") ? true : false;
+      console.log("Token set via setToken reducer ");
+    },
+    clearToken: (state) => {
+      state.userToken = null;
+      state.isAuthenticated = false;
+    },
   },
   extraReducers: (builder) => {
     // User registration
@@ -122,6 +133,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setToken } = authSlice.actions;
 
 export default authSlice.reducer;

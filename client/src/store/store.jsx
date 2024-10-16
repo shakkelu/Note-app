@@ -10,7 +10,7 @@ const token = localStorage.getItem("token")
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    modal: modalReducer, // Now inside the reducer object
+    modal: modalReducer,
   },
   preloadedState: {
     auth: {
@@ -23,5 +23,4 @@ const store = configureStore({
   },
 });
 
-// Make sure to export store as the default
 export default store;
