@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../store/authSlice";
 import { useNavigate } from "react-router-dom"; // If using react-router for navigation
 
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

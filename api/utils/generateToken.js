@@ -6,10 +6,14 @@ import jwt from "jsonwebtoken";
  * @param {string} userId - The unique identifier of the user.
  * @returns {string} - The signed JWT token.
  */
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+export const generateAccessToken = (userId) => {
+  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d", // Token expires in one day
   });
 };
 
-export default generateToken;
+export const generateRefreshToken = (userId) => {
+  return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "1d", // Token expires in one day
+  });
+};

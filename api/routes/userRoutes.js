@@ -1,7 +1,10 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
-import generateToken from "../utils/generateToken.js"; // Import the token utility
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateToken.js"; // Import the token utility
 
 const router = express.Router();
 
@@ -20,9 +23,14 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-    res.json({ token, message: "User registered successfully" }); // Send token upon registration
+    user.refreshTokens.push(refreshToken);
+    await user.save();
+
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    res.json({ accessToken, message: "User registered successfully" }); // Send token upon registration
   } catch (err) {
     res.status(500).json({ error: "Failed to register user" });
   }
@@ -52,12 +60,38 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
     // Generate token
-    const token = generateToken(user._id);
+    const accessToken = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-    res.json({ token, message: "User login successfull" }); // Send token upon login
+    user.refreshTokens.push(refreshToken);
+    await user.save();
+
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    res.json({ accessToken }); // Send token upon login
   } catch (err) {
     res.status(500).json({ error: "Login failed" });
   }
+});
+
+// Route to refresh access token using refresh token
+app.post("/refresh-token", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ error: "Invalid credentials" });
+
+  if (!refreshToken || !user.refreshTokens.includes(refreshToken)) {
+    return res
+      .status(403)
+      .json({ message: "Refresh token not found or invalid" });
+  }
+
+  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+    const newAccessToken = generateAccessToken(user._id);
+    res.json({ accessToken: newAccessToken });
+  });
 });
 
 export default router;

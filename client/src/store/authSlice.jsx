@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../utils/axiosConfig";
 import axios from "axios";
 
 // Register User Thunk
@@ -6,13 +7,10 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/users/register",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await api.post("/api/users/register", {
+        email,
+        password,
+      });
       return response.data; // Contains token and message
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -41,13 +39,10 @@ export const loginWithPassword = createAsyncThunk(
   "auth/loginWithPassword",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/users/login",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await api.post("/api/users/login", {
+        email,
+        password,
+      });
       return response.data.token; // Return token on success
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -72,10 +67,8 @@ const authSlice = createSlice({
       localStorage.removeItem("token"); // Remove token from storage
     },
     setToken: (state, action) => {
-      state.userToken = localStorage.getItem("token")
-        ? localStorage.getItem("token")
-        : null;
-      state.isAuthenticated = localStorage.getItem("token") ? true : false;
+      state.userToken = action.payload;
+      state.isAuthenticated = true;
       console.log("Token set via setToken reducer ");
     },
     clearToken: (state) => {

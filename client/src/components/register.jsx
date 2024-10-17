@@ -14,6 +14,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log();
       // Optionally, save the token to localStorage for persistence
       localStorage.setItem("token", userToken);
       // Redirect to a protected route after registration
