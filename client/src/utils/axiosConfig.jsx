@@ -1,4 +1,11 @@
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setToken } from "../store/authSlice";
+
+const dispatch = useDispatch();
+const { isAuthenticated, userToken } = useSelector((state) => {
+  state.auth;
+});
 
 const api = axios.create({
   baseURL: "http://localhost:4000",
@@ -6,9 +13,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
     }
     return config;
   },
@@ -30,7 +36,7 @@ api.interceptors.response.use(
           {},
           { withCredentials: true }
         );
-        localStorage.setItem("accessToken", data.accessToken);
+        dispatch(setToken(data.accessToken));
 
         // Retry the original request with the new token
         api.defaults.headers.common[
