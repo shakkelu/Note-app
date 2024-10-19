@@ -60,7 +60,7 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
     // Generate token
-    const accessToken = generateToken(user._id);
+    const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
     user.refreshTokens.push(refreshToken);
@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Route to refresh access token using refresh token
-app.post("/refresh-token", async (req, res) => {
+router.post("/refresh-token", async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   const user = await User.findOne({ email });
@@ -90,6 +90,7 @@ app.post("/refresh-token", async (req, res) => {
     if (err) return res.status(403).json({ message: "Invalid refresh token" });
 
     const newAccessToken = generateAccessToken(user._id);
+
     res.json({ accessToken: newAccessToken });
   });
 });

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user";
 
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
@@ -9,11 +10,15 @@ const verifyToken = (req, res, next) => {
   }
 
   // Verify token
-  jwt.verify(token.split(" ")[1], ACCESS_TOKEN_SECRET, (err, decoded) => {
+  jwt.verify(token.split(" ")[1], ACCESS_TOKEN_SECRET, async (err, decoded) => {
     if (err) {
       return res.status(401).send("Invalid token");
     }
-    req.user = decoded; // Attach the decoded user data to the request object
+    console.log(decoded);
+    req.user = await User.findById(decoded._id).select("-password");
+
     next();
   });
 };
+
+export default verifyToken;
