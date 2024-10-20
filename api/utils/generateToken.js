@@ -7,13 +7,21 @@ import jwt from "jsonwebtoken";
  * @returns {string} - The signed JWT token.
  */
 export const generateAccessToken = (userId) => {
-  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
+  const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d", // Token expires in one day
   });
+  console.log(
+    `Access token created at generateToken , this is token - ${accessToken} `
+  );
+  return accessToken;
 };
 
 export const generateRefreshToken = (userId) => {
-  return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "1d", // Token expires in one day
   });
+  console.log(
+    `Refresh token created at generateToken , this is token - ${refreshToken} `
+  );
+  return refreshToken;
 };

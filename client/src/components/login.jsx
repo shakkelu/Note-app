@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../store/authSlice";
-import { useNavigate } from "react-router-dom"; // If using react-router for navigation
-
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
-  const { loading, error, isAuthenticated, userToken } = useSelector(
+  const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth
   );
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Optionally, save the token to localStorage for persistence
-      localStorage.setItem("token", userToken);
-      // Redirect to a protected route after login
-      navigate("/dashboard"); // Replace with your desired route
+      navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, userToken]);
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -16,6 +16,7 @@ const verifyToken = (req, res, next) => {
     }
     console.log(decoded);
     req.user = await User.findById(decoded._id).select("-password");
+    console.log("Middleware run success");
 
     next();
   });

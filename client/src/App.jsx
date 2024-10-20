@@ -8,6 +8,7 @@ import { Route, Routes } from "react-router-dom";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { Body } from "./components/body";
+import LandingPage from "./components/landingPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<Home />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
+            <Route path="/dashboard" element={<LandingPage />}></Route>
           </Routes>
         </Body>
         <Footer />
