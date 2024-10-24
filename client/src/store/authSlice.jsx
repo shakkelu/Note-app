@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 // Register User Thunk
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/register", {
+      const response = await axiosInstance.post("api/users/register", {
         email,
         password,
       });
@@ -23,10 +23,9 @@ export const validateEmail = createAsyncThunk(
   "auth/validateEmail",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        "http://localhost:4000/api/users/validateEmail",
-        { email }
-      );
+      const response = await axiosInstance.post("/users/validateEmail", {
+        email,
+      });
       return response.data; // Assuming the response tells whether the email exists
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -39,7 +38,7 @@ export const loginWithPassword = createAsyncThunk(
   "auth/loginWithPassword",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/users/login", {
+      const response = await axiosInstance.post("api/users/login", {
         email,
         password,
       });
@@ -64,7 +63,6 @@ const authSlice = createSlice({
     logout: (state) => {
       state.userToken = null;
       state.isAuthenticated = false;
-      localStorage.removeItem("token"); // Remove token from storage
     },
     setToken: (state, action) => {
       state.userToken = action.payload;
@@ -86,7 +84,9 @@ const authSlice = createSlice({
       state.loading = false;
       state.userToken = action.payload.token; // Store token from registration
       state.isAuthenticated = true;
-      console.log(action.payload);
+      console.log(
+        `From registerUser fulfilled , payload content : ${action.payload}`
+      );
     });
     builder.addCase(registerUser.rejected, (state, action) => {
       state.loading = false;
@@ -117,7 +117,9 @@ const authSlice = createSlice({
       state.loading = false;
       state.userToken = action.payload.accessToken;
       state.isAuthenticated = true;
-      console.log(action.payload);
+      console.log(
+        `From loginWithPassword fulfilled , payload content : ${action.payload} `
+      );
     });
     builder.addCase(loginWithPassword.rejected, (state, action) => {
       state.loading = false;

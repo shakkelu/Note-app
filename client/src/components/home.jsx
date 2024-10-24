@@ -10,9 +10,6 @@ const Home = () => {
   const dispatch = useDispatch();
   const { isModalOpen, modalContentType } = useSelector((state) => state.modal); // Access modal state from Redux
 
-  const { userToken } = useSelector((state) => state.auth);
-  console.log(userToken);
-
   // Modal content based on the state
   let modalContent;
   if (modalContentType === "login") {
@@ -28,7 +25,6 @@ const Home = () => {
           <div className="welcome-message">
             <h1>Welcome to Notes App</h1>
           </div>
-          {userToken}
         </div>
         <div className="button-container">
           <div className="faa">

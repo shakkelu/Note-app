@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
  * @param {string} userId - The unique identifier of the user.
  * @returns {string} - The signed JWT token.
  */
-export const generateAccessToken = (userId) => {
-  const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
+export const generateAccessToken = (_id) => {
+  const accessToken = jwt.sign({ _id }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d", // Token expires in one day
   });
   console.log(
@@ -16,8 +16,8 @@ export const generateAccessToken = (userId) => {
   return accessToken;
 };
 
-export const generateRefreshToken = (userId) => {
-  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+export const generateRefreshToken = (_id) => {
+  const refreshToken = jwt.sign({ _id }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "1d", // Token expires in one day
   });
   console.log(

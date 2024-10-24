@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  refreshTokens: { type: [String] }, // Array to store multiple refresh tokens
 });
 
 UserSchema.pre("save", async function (next) {

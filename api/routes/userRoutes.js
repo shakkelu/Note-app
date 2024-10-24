@@ -19,24 +19,25 @@ router.post("/register", async (req, res) => {
     }
 
     const user = new User({ email, password });
-    await user.save();
+    await user.save(); // Save the user in the database
+    console.log("New user is saved in the database!");
 
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    user.refreshTokens.push(refreshToken);
-    await user.save();
-
-    // Cookie settings
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure only for production
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
     };
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
-    res.json({ accessToken, message: "User registered successfully" });
+    res.json({
+      accessToken,
+      message: "User registered successfully",
+    });
   } catch (err) {
+    console.error("Error saving user:", err); // Log the actual error to help diagnose it
     res.status(500).json({ error: "Failed to register user" });
   }
 });
@@ -67,9 +68,6 @@ router.post("/login", async (req, res) => {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    user.refreshTokens.push(refreshToken);
-    await user.save();
-
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set secure only for production
@@ -79,12 +77,14 @@ router.post("/login", async (req, res) => {
     res.cookie("refreshToken", refreshToken, cookieOptions);
     res.json({ accessToken });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Login failed" });
   }
 });
 
 // Route to refresh access token using refresh token
-router.post("/refresh-token", async (req, res) => {
+router.get("/refresh-token", async (req, res) => {
+  console.log(req.cookies);
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -93,10 +93,10 @@ router.post("/refresh-token", async (req, res) => {
 
   try {
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
+    console.log(decoded);
     // Find user by ID from the decoded token
     const user = await User.findById(decoded._id);
-    if (!user || !user.refreshTokens.includes(refreshToken)) {
+    if (!user) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
