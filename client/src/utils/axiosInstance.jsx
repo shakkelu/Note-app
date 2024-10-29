@@ -12,14 +12,11 @@ const axiosInstance = axios.create({
 // Add request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log("Inside the interceptor!");
     const state = storage.getState();
     const token = state.auth.userToken; // Access token from Redux store
-    console.log(token);
 
     if (token) {
       config.headers.authorization = `Bearer ${token}`; // Attach token to headers
-      console.log("Token mounted in header by the interceptor!");
     }
 
     return config;

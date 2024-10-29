@@ -1,114 +1,19 @@
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"; // Import JWT if not already done
-import User from "../models/user.js";
 import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/generateToken.js"; // Import the token utility
+  registerController,
+  loginController,
+  validateEmail,
+} from "../controllers/authController.js";
+import { refreshTokenLogic } from "../utils/refreshToken.js";
 
 const router = express.Router();
 
-// Register a new user
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already in use" });
-    }
+router.post("/register", registerController);
 
-    const user = new User({ email, password });
-    await user.save(); // Save the user in the database
-    console.log("New user is saved in the database!");
+router.post("/validateEmail", validateEmail);
 
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+router.post("/login", loginController);
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    };
-
-    res.cookie("refreshToken", refreshToken, cookieOptions);
-    res.json({
-      accessToken,
-      message: "User registered successfully",
-    });
-  } catch (err) {
-    console.error("Error saving user:", err); // Log the actual error to help diagnose it
-    res.status(500).json({ error: "Failed to register user" });
-  }
-});
-
-// Email validation route
-router.post("/validateEmail", async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Email not found" });
-
-    res.json({ message: "Email verified successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "Email verification failed" });
-  }
-});
-
-// Login route
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid credentials" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
-
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure only for production
-      sameSite: "strict",
-    };
-
-    res.cookie("refreshToken", refreshToken, cookieOptions);
-    res.json({ accessToken });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Login failed" });
-  }
-});
-
-// Route to refresh access token using refresh token
-router.get("/refresh-token", async (req, res) => {
-  console.log(req.cookies);
-  const refreshToken = req.cookies.refreshToken;
-
-  if (!refreshToken) {
-    return res.status(403).json({ message: "No refresh token provided" });
-  }
-
-  try {
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    console.log(decoded);
-    // Find user by ID from the decoded token
-    const user = await User.findById(decoded._id);
-    if (!user) {
-      return res.status(403).json({ message: "Invalid refresh token" });
-    }
-
-    // Generate a new access token
-    const newAccessToken = generateAccessToken(user._id);
-
-    res.json({ accessToken: newAccessToken });
-  } catch (err) {
-    return res
-      .status(403)
-      .json({ message: "Invalid or expired refresh token" });
-  }
-});
+router.get("/refresh-token", refreshTokenLogic);
 
 export default router;
