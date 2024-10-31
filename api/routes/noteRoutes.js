@@ -10,15 +10,14 @@ import {
 
 const router = express.Router();
 
-// Get all notes for the authenticated user
 router.get("/get-notes", verifyToken, getNotes);
 
 router.post("/create", verifyToken, createNote);
 
-router.get("/get-note", verifyToken, getNote);
+router.get("/get-note/:noteId", verifyToken, getNote);
 
 router.put("/edit", verifyToken, editNote);
 
-router.delete("/delete-note", deleteNote);
+router.delete("/delete-note/:noteId", deleteNote);
 
 export default router;

@@ -6,23 +6,65 @@ import {
 } from "../utils/generateToken";
 
 /* 
-
-
+|
+|
 Register controller
-
-
+|
+|
 */
 export const registerController = async (req, res) => {
+  console.log(`
+    *
+    *
+    *
+    ###### INSIDE registerController ######
+     `);
   const { email, password } = req.body;
+  if (email && password) {
+    console.log(`
+    *
+    *
+    *
+    request with email and password reached at server
+   `);
+  } else {
+    console.log(`
+    *
+    *
+    *
+    email and password not reached at server!
+     `);
+  }
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log(`
+    *
+    *
+    *
+    found user already exists!
+     `);
       return res.status(400).json({ error: "Email already in use" });
     }
 
     const user = new User({ email, password });
-    await user.save(); // Save the user in the database
-
+    const dbSave = await user.save(); // Save the user in the database
+    if (dbSave) {
+      console.log(`
+    *
+    *
+    *
+   new user saved in DB
+     `);
+    } else {
+      console.log(`
+    *
+    *
+    *
+    couldn't save the new user in DB!
+     `);
+    }
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
@@ -37,6 +79,11 @@ export const registerController = async (req, res) => {
       accessToken,
       message: "User registered successfully",
     });
+    console.log(`
+      *
+      *
+      * 
+      response sent after user registration. {accessToken , message}`);
   } catch (err) {
     console.error("Error saving user:", err); // Log the actual error to help diagnose it
     res.status(500).json({ error: "Failed to register user" });
@@ -44,11 +91,11 @@ export const registerController = async (req, res) => {
 };
 
 /* 
-
-
+|
+|
 Login controller
-
-
+|
+|
 */
 
 export const loginController = async (req, res) => {
@@ -78,11 +125,11 @@ export const loginController = async (req, res) => {
 };
 
 /* 
-
-
+|
+|
 Validate email controller
-
-
+|
+|
 */
 
 export const validateEmail = async (req, res) => {

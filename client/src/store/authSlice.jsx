@@ -1,24 +1,47 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
 
-// Register User Thunk
+/* 
+|
+|
+Register user thunk
+|
+|
+*/
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
+    console.log(`
+    *
+    *
+    *
+    ###### INSIDE registerUser thunk ######
+     `);
     try {
       const response = await axiosInstance.post("/user/register", {
         email,
         password,
       });
-
-      return response.data; // Contains token and message
+      console.log(`
+    *
+    *
+    *
+    response recieved
+   `);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
 
-// Validate Email Thunk
+/* 
+|
+|
+Validate email thunk
+|
+|
+*/
 export const validateEmail = createAsyncThunk(
   "auth/validateEmail",
   async ({ email }, { rejectWithValue }) => {
@@ -33,10 +56,22 @@ export const validateEmail = createAsyncThunk(
   }
 );
 
-// Login with Password Thunk
+/* 
+|
+|
+Login with password thunk
+|
+|
+*/
 export const loginWithPassword = createAsyncThunk(
   "auth/loginWithPassword",
   async ({ email, password }, { rejectWithValue }) => {
+    console.log(`
+    *
+    *
+    *
+    ###### INSIDE loginWithPassword thunk ######
+     `);
     try {
       const response = await axiosInstance.post("/user/login", {
         email,
@@ -65,7 +100,22 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
     },
     setToken: (state, action) => {
-      state.userToken = action.payload;
+      state.userToken = action.payload.accessToken;
+      if (action.payload.accessToken) {
+        console.log(`
+    *
+    *
+    *
+    token recieved and stored in state
+   `);
+      } else {
+        console.log(`
+    *
+    *
+    *
+    token not recieved
+   `);
+      }
       state.isAuthenticated = true;
     },
     clearToken: (state) => {
@@ -74,48 +124,114 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // User registration
+    /* 
+|
+|
+User registration
+|
+|
+*/
     builder.addCase(registerUser.pending, (state) => {
       state.loading = true;
-      state.error = null;
     });
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.loading = false;
-      state.userToken = action.payload.token; // Store token from registration
+      state.userToken = action.payload.accessToken;
+      if (action.payload.accessToken) {
+        console.log(`
+    *
+    *
+    *
+    token recieved and stored in state
+   `);
+      } else {
+        console.log(`
+    *
+    *
+    *
+    token not recieved
+   `);
+      }
       state.isAuthenticated = true;
+      console.log(`
+    *
+    *
+    *
+    registration complete
+   `);
     });
     builder.addCase(registerUser.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      console.log(`
+      *
+      *
+      * 
+      rejected`);
     });
 
-    // Email validation
+    /* 
+|
+|
+Email validation
+|
+|
+*/
     builder.addCase(validateEmail.pending, (state) => {
       state.loading = true;
-      state.error = null;
     });
     builder.addCase(validateEmail.fulfilled, (state, action) => {
       state.loading = false;
-      state.emailValidated = true; // Email is validated
+      state.emailValidated = true;
     });
     builder.addCase(validateEmail.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      console.log(`
+      *
+      *
+      * 
+      rejected`);
     });
 
-    // Password login
+    /* 
+|
+|
+Login with password
+|
+|
+*/
     builder.addCase(loginWithPassword.pending, (state) => {
       state.loading = true;
-      state.error = null;
     });
     builder.addCase(loginWithPassword.fulfilled, (state, action) => {
       state.loading = false;
       state.userToken = action.payload.accessToken;
+      if (action.payload.accessToken) {
+        console.log(`
+    *
+    *
+    *
+    token recieved and stored in state
+   `);
+      } else {
+        console.log(`
+    *
+    *
+    *
+    token not recieved
+   `);
+      }
       state.isAuthenticated = true;
     });
     builder.addCase(loginWithPassword.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      console.log(`
+      *
+      *
+      * 
+      rejected`);
     });
   },
 });

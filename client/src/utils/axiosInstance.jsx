@@ -12,6 +12,12 @@ const axiosInstance = axios.create({
 // Add request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    console.log(`
+    *
+    *
+    *
+    ###### INSIDE request interceptor ######
+     `);
     const state = storage.getState();
     const token = state.auth.userToken; // Access token from Redux store
 
@@ -29,9 +35,21 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor to handle token refresh logic
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log(`
+    *
+    *
+    *
+    ###### INSIDE normal response interceptor ######
+     `);
     return response;
   },
   async (error) => {
+    console.log(`
+    *
+    *
+    *
+    ###### INSIDE error response interceptor ######
+     `);
     const originalRequest = error.config;
 
     // If the response is 401 (Unauthorized) and it's not already retried
@@ -40,12 +58,10 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Attempt to refresh the access token
-        const refreshResponse = await axiosInstance.get(
-          "api/users/refresh-token"
-        );
+        const refreshResponse = await axiosInstance.get("/user/refresh-token");
 
         // Get new access token from refresh response
-        const newAccessToken = refreshResponse.data.accessToken;
+        const newAccessToken = refreshResponse.data;
 
         // Update the access token in Redux store
         storage.dispatch(setToken(newAccessToken));
