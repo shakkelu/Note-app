@@ -1,5 +1,24 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
+import axios from "axios";
+
+export const checkAuthentication = createAsyncThunk(
+  "auth/checkAuthentication",
+  async (_, { rejectWithValue }) => {
+    try {
+      // API call to check if the user is authenticated
+      const response = await axios.get(
+        "http://localhost:4000/user/refresh-token",
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 /* 
 |
@@ -124,6 +143,45 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    /* 
+|
+|
+Auth check
+|
+|
+*/
+    builder.addCase(checkAuthentication.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(checkAuthentication.fulfilled, (state, action) => {
+      state.loading = false;
+      state.userToken = action.payload.accessToken;
+      if (action.payload.accessToken) {
+        console.log(`
+    *
+    *
+    *
+    new access token recieved and stored in state
+   `);
+      } else {
+        console.log(`
+    *
+    *
+    *
+    token not recieved, person is not authenticated
+   `);
+      }
+      state.isAuthenticated = true;
+    });
+    builder.addCase(checkAuthentication.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      console.log(`
+      *
+      *
+      * 
+      rejected , person is not authenticated`);
+    });
     /* 
 |
 |

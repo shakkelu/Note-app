@@ -1,6 +1,7 @@
 import "./App.css";
-import { Provider, useSelector } from "react-redux";
-import store from "./store/store";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { checkAuthentication } from "./store/authSlice";
 import Login from "./components/login";
 import Register from "./components/register";
 import Home from "./components/home";
@@ -11,20 +12,32 @@ import { Body } from "./components/body";
 import LandingPage from "./components/landingPage";
 
 function App() {
+  const dispatch = useDispatch();
+  const { loading, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Dispatch the checkAuthentication thunk on initial load
+    dispatch(checkAuthentication());
+  }, [dispatch]);
+
+  // Show a loading text while the auth check is in progress
+  if (loading) return "Loading...";
+
   return (
     <>
-      <Provider store={store}>
-        <Header />
-        <Body>
-          <Routes>
-            <Route path="/" element={<Home />}></Route>
-            <Route path="/login" element={<Login />}></Route>
-            <Route path="/register" element={<Register />}></Route>
-            <Route path="/dashboard" element={<LandingPage />}></Route>
-          </Routes>
-        </Body>
-        <Footer />
-      </Provider>
+      <Header />
+      <Body>
+        <Routes>
+          <Route
+            path="/"
+            element={isAuthenticated ? <Home /> : <LandingPage />}
+          ></Route>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="/register" element={<Register />}></Route>
+          <Route path="/dashboard" element={<LandingPage />}></Route>
+        </Routes>
+      </Body>
+      <Footer />
     </>
   );
 }
