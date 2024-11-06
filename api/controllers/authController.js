@@ -3,7 +3,7 @@ import User from "../models/user.js";
 import {
   generateAccessToken,
   generateRefreshToken,
-} from "../utils/generateToken";
+} from "../utils/generateToken.js";
 
 /* 
 |

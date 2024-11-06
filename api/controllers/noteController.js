@@ -33,8 +33,8 @@ export const getNotes = async (req, res) => {
     }
 
     const notes = await Note.find({ user: user._id }).select({
-      title: { $substr: ["$title", 0, 10] }, // Fetch first 10 characters of title
-      content: { $substr: ["$content", 0, 15] }, // Fetch first 15 characters of content
+      title: { $substr: ["$title", 0, 20] }, // Fetch first 10 characters of title
+      content: { $substr: ["$content", 0, 30] }, // Fetch first 15 characters of content
     });
 
     if (notes) {
@@ -120,8 +120,9 @@ export const createNote = async (req, res) => {
     new note is not saved in the body 
      `);
     }
-
-    res.status(200).json({ message: " New note created succesfully!" });
+    res
+      .status(200)
+      .json({ newNote, message: " New note created succesfully!" });
   } catch (error) {
     res.status(500).json({ error: "Failed to create note" });
   }

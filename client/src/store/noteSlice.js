@@ -70,6 +70,7 @@ export const getNote = createAsyncThunk(
     *
     *
     ###### INSIDE getNote thunk ######
+    ${noteId}
      `);
     try {
       const response = await axiosInstance.get(`/note/get-note/${noteId}`);
@@ -97,7 +98,7 @@ export const editNote = createAsyncThunk(
     ###### INSIDE editNote thunk ######
      `);
     try {
-      const response = await axiosInstance.get("/note/edit", {
+      const response = await axiosInstance.put("/note/edit", {
         noteId,
         title,
         content,
@@ -127,11 +128,11 @@ export const deleteNote = createAsyncThunk(
     ###### INSIDE deleteNote thunk ######
      `);
     try {
-      const response = await axiosInstance.delete("/note/delete-note", {
-        noteId,
-      });
+      const response = await axiosInstance.delete(
+        `/note/delete-note/${noteId}`
+      );
 
-      return response.data;
+      return noteId;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -145,9 +146,14 @@ const noteSlice = createSlice({
     note: null,
     user: null,
     isLoading: false,
+    newNoteFlag: false,
     message: null,
   },
-  reducers: {},
+  reducers: {
+    resetNewNoteFlag(state) {
+      state.newNoteFlag = false;
+    },
+  },
   extraReducers: (builder) => {
     /* 
 |
@@ -202,6 +208,7 @@ Create new note
       state.isLoading = false;
       state.message = action.payload.message;
       state.note = action.payload.newNote;
+      state.newNoteFlag = true;
       if (action.payload.newNote) {
         console.log(`
       *
@@ -297,9 +304,10 @@ Delete a specific note
       state.isLoading = true;
     });
 
-    builder.addCase(deleteNote.fulfilled, (state) => {
+    builder.addCase(deleteNote.fulfilled, (state, action) => {
       state.isLoading = false;
       state.note = null;
+      state.notes = state.notes.filter((note) => note._id !== action.payload);
       console.log(`
       *
       *
@@ -317,7 +325,12 @@ Delete a specific note
     });
   },
 });
+
+export const { resetNewNoteFlag } = noteSlice.actions;
+
 export const getNotesState = (state) => state.notes.notes;
 export const getNoteState = (state) => state.notes.note;
+export const getLoadingState = (state) => state.notes.isLoading;
+export const getNewNoteFlag = (state) => state.notes.newNoteFlag;
 
 export default noteSlice.reducer;

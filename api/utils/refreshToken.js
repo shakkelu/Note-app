@@ -14,11 +14,17 @@ export const refreshTokenLogic = async (req, res) => {
     *
     *
     *
-    ###### INSIDE refreshTokenLogin ######
+    ###### INSIDE refreshTokenLogic ######
      `);
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
+    console.log(`
+    *
+    *
+    *
+    refresh token not recieved from cookie
+   `);
     return res.status(403).json({ message: "No refresh token provided" });
   } else {
     console.log(`

@@ -1,7 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
 import axios from "axios";
-
+/* 
+|
+|
+Authentication checking before the app rendering
+|
+|
+*/
 export const checkAuthentication = createAsyncThunk(
   "auth/checkAuthentication",
   async (_, { rejectWithValue }) => {

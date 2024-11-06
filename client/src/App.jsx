@@ -10,6 +10,8 @@ import Header from "./components/header";
 import Footer from "./components/footer";
 import { Body } from "./components/body";
 import LandingPage from "./components/landingPage";
+import Note from "./components/note";
+import NewNote from "./components/newNote";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,11 +32,13 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={isAuthenticated ? <Home /> : <LandingPage />}
+            element={isAuthenticated ? <LandingPage /> : <Home />}
           ></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
           <Route path="/dashboard" element={<LandingPage />}></Route>
+          <Route path="/note" element={<Note />}></Route>
+          <Route path="/create" element={<NewNote />}></Route>
         </Routes>
       </Body>
       <Footer />

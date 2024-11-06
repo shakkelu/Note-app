@@ -1,15 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNoteState, editNote } from "../store/noteSlice";
-import { closeButton } from "../store/modalSlice";
+import {
+  getNoteState,
+  getLoadingState,
+  editNote,
+  resetNewNoteFlag,
+} from "../store/noteSlice";
+import { useNavigate } from "react-router-dom";
 
 const Note = () => {
   const note = useSelector(getNoteState);
+  const loading = useSelector(getLoadingState);
   const dispatch = useDispatch();
-  const [title, setTitle] = useState(note.title);
-  const [content, setContent] = useState(note.content);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const noteId = note._id;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ensure the note is available before setting title and content
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+      // Reset the newNoteFlag when the note is displayed
+      dispatch(resetNewNoteFlag());
+    } else {
+      navigate("/dashboard");
+    }
+  }, [note, dispatch, navigate]);
 
   // Toggle edit mode
   const handleEditClick = () => {
@@ -19,12 +37,21 @@ const Note = () => {
   // Save changes and exit edit mode
   const handleSaveClick = () => {
     setIsEditing(false);
-    dispatch(editNote({ noteId, title, content }));
+    if (note) {
+      dispatch(editNote({ noteId: note._id, title, content }));
+    }
   };
+
+  const handleClose = () => {
+    navigate("/dashboard");
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (!note) return <div>Note not obtained :/</div>;
 
   return (
     <div>
-      {note && (
+      {!loading && (
         <>
           <div>
             {isEditing ? (
@@ -51,12 +78,12 @@ const Note = () => {
       )}
       <div>
         {isEditing ? (
-          <button onClick={() => handleSaveClick}>Save</button>
+          <button onClick={handleSaveClick}>Save</button>
         ) : (
-          <button onClick={() => handleEditClick}>Edit</button>
+          <button onClick={handleEditClick}>Edit</button>
         )}
       </div>
-      <div onClick={() => dispatch(closeButton)}>Close</div>
+      <div onClick={handleClose}>Close</div>
     </div>
   );
 };
