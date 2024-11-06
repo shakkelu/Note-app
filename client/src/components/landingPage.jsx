@@ -20,9 +20,9 @@ export default function LandingPage() {
     dispatch(getNotes());
   }, [dispatch]);
 
-  const handleOnClickOnNote = (noteId) => {
+  const handleOnClickOnNote = async (noteId) => {
     console.log(noteId);
-    dispatch(getNote({ noteId }));
+    await dispatch(getNote({ noteId }));
     navigate("/note");
   };
 
